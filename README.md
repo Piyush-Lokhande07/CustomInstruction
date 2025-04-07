@@ -1,18 +1,21 @@
-# Custom Instruction Compiler for Equation `z = a*a + b*b - 2*a*b`
+# 🔧 Custom Instruction for `z = a*a + b*b - 2*a*b`
 
-## Objective
+## 🎯 Objective
 
-This project demonstrates the design and implementation of **custom assembly instructions** to compute the equation:
+This project demonstrates how to **design and implement custom assembly instructions** to compute the mathematical equation:
 
 ```
 z = a*a + b*b - 2*a*b
 ```
 
-We use NASM (Netwide Assembler) to write and compile assembly code, and Python to drive the process, generate tokens, symbol tables, and intermediate (three-address) code. The goal is to mimic a mini compiler that processes arithmetic expressions at a low level.
+It simulates a mini-compiler that performs the full compilation flow using:
+- ✅ NASM (Netwide Assembler)
+- ✅ Python for automation
+- ✅ objdump to inspect the generated assembly
 
 ---
 
-## Flow of Execution
+## 🔄 Flow of Execution
 
 When you run:
 
@@ -20,147 +23,156 @@ When you run:
 python3 main.py COMPUTE_Z 2 3
 ```
 
-The process works as follows:
+Here’s what happens step-by-step:
 
-1. **User Input**  
-   The Python script (`main.py`) receives the command `COMPUTE_Z` along with values for `a` and `b` (here, `2` and `3`).
+1. 📥 **Input Handling**
+   - Python (`main.py`) reads values for `a` and `b`.
 
-2. **Assembly File Generation**  
-   The function `update_asm()` in `compiler/input_writer.py` updates `compute_z.asm` by inserting the input values. The assembly file now contains instructions that compute:
-   - `a * a`
-   - `b * b`
-   - `2 * a * b`  
-   and then combines them as:
-   ```
-   z = a*a + b*b - 2*a*b
-   ```
+2. 📝 **Assembly File Update**
+   - `compute_z.asm` is updated with these values via `compiler/input_writer.py`.
 
-3. **Assembly and Linking**  
-   The script uses NASM to assemble `compute_z.asm` into an object file (`compute_z.o`), and then `ld` is used to link the object file into an executable (`compute_z`).
+3. 🏗️ **Assembly & Linking**
+   - The assembly file is compiled into machine code using `nasm` and `ld`.
 
-4. **Execution**  
-   The executable is run, which loads the values from memory into registers, performs the arithmetic step-by-step, converts the result to a string, and prints the final output.
+4. 🚀 **Execution**
+   - The generated executable computes the value and prints the result.
 
-5. **Additional Compiler Internals**  
-   Along with the computed result, the program also displays:
-   - **Tokens**: A list of basic elements (e.g., identifiers, operators) that make up the expression.
-   - **Symbol Table**: A table that shows the variables (`a`, `b`, and `z`), their types (e.g., `int`), and their values.
-   - **Three-Address Code (TAC)**: An intermediate representation breaking down the expression into simple operations.
+5. 🧠 **Compiler Internals Output**
+   - You also get:
+     - 🧩 **Tokens**
+     - 📘 **Symbol Table**
+     - 🛠️ **Three-Address Code (TAC)**
 
 ---
 
-## Pseudo-Register Loading Explanation
+## 📦 Pseudo-Register Loading (Easy Explanation)
 
-In our assembly code, we use registers to hold temporary values during computation. For simplicity, we can think of registers as temporary variables named R1, R2, etc.:
+Think of CPU registers as R1, R2, etc. Here’s how the equation is calculated:
 
-1. **Compute `a*a`:**
-   - **R1**: Load value of `a` from memory.
-   - Multiply R1 by itself → R1 now holds `a*a`.
-   - **R2**: Store the result (i.e., `a*a`) in R2.
+```assembly
+; Step 1: a*a
+R1 = a
+R1 = R1 * a        ; R1 = a^2
+R2 = R1            ; Store in R2
 
-2. **Compute `b*b`:**
-   - **R1**: Reload value of `b` from memory.
-   - Multiply R1 by itself → R1 now holds `b*b`.
-   - Add R1 to R2, so R2 now equals `a*a + b*b`.
+; Step 2: b*b
+R1 = b
+R1 = R1 * b        ; R1 = b^2
+R2 = R2 + R1       ; R2 = a^2 + b^2
 
-3. **Compute `2*a*b`:**
-   - **R1**: Load value of `a` from memory.
-   - Multiply R1 by `b` → R1 = `a*b`.
-   - Double R1 (R1 = `2*a*b`).
-   - Subtract R1 from R2, so R2 becomes `a*a + b*b - 2*a*b`.
+; Step 3: 2*a*b
+R1 = a
+R1 = R1 * b        ; R1 = a*b
+R1 = R1 * 2        ; R1 = 2*a*b
+R2 = R2 - R1       ; Final: z = a^2 + b^2 - 2*a*b
+```
 
-4. **Store the Result:**
-   - The final result in R2 is stored in memory variable `z`.
-
----
-
-## Prerequisites
-
-Before running this project, ensure you have the following installed:
-
-1. **Python 3**  
-   Download from [python.org](https://www.python.org/downloads/).  
-   (Optionally, install dependencies via: `pip install -r requirements.txt` if a requirements file is provided.)
-
-2. **NASM (Netwide Assembler)**  
-   Download and install from [nasm.us](https://www.nasm.us/).  
-   Verify installation with:
-   ```bash
-   nasm -v
-   ```
-
-3. **ld (Linker)**  
-   Typically installed with your build-essential package.  
-   On Ubuntu/Debian:
-   ```bash
-   sudo apt-get install build-essential
-   ```
-
-4. **objdump**  
-   Install via binutils (usually pre-installed or installed with GCC):
-   ```bash
-   sudo apt-get install binutils
-   ```
-
-5. **Bash (optional)**  
-   Needed for running shell commands. Linux and macOS have Bash by default; Windows users can use Git Bash or WSL.
+✅ Final result is in `R2`, and it's stored in variable `z`.
 
 ---
 
-## Steps to Run
+## 📋 Prerequisites
 
-1. **Clone the Repository**
+Make sure you have these installed:
 
-   ```bash
-   git clone https://github.com/Piyush-Lokhande07/CustomInstruction.git
-   cd mini_compiler
-   ```
+- 🐍 **Python 3**  
+  [Download](https://www.python.org/downloads/)  
+  *(Optional)* Install dependencies:  
+  ```bash
+  pip install -r requirements.txt
+  ```
 
-2. **Assemble the Code**
+- 🛠️ **NASM (Assembler)**  
+  [Download](https://www.nasm.us/)  
+  Verify:
+  ```bash
+  nasm -v
+  ```
 
-   Use NASM to convert `compute_z.asm` into an object file:
-   ```bash
-   nasm -f elf64 compute_z.asm -o compute_z.o
-   ```
+- 🔗 **ld (Linker)**  
+  Linux:  
+  ```bash
+  sudo apt-get install build-essential
+  ```
 
-3. **Link the Object File**
+- 🔍 **objdump**  
+  For inspecting binaries:  
+  ```bash
+  sudo apt-get install binutils
+  ```
 
-   Link the object file to create the executable:
-   ```bash
-   ld -o compute_z compute_z.o
-   ```
-
-4. **Run the Python Script**
-
-   Compute the equation by running:
-   ```bash
-   python3 main.py COMPUTE_Z 2 3
-   ```
-
-   This will:
-   - Update `compute_z.asm` with `a = 2` and `b = 3`.
-   - Assemble and link the code.
-   - Execute the program, printing the computed result and the compiler internals (tokens, symbol table, and TAC).
-
-5. **View the Disassembled Assembly Code**
-
-   To see the low-level machine code, run:
-   ```bash
-   objdump -d compute_z
-   ```
+- 💻 **Bash**  
+  (Default on Linux/macOS, use Git Bash or WSL on Windows)
 
 ---
 
-## Conclusion
+## 🧪 Steps to Run
 
-This project shows you how custom assembly instructions can be designed to compute a mathematical equation, with a full compiler-like flow:
-- **Lexical Analysis** (tokens),
-- **Syntax and Semantic Analysis** (symbol table),
-- **Intermediate Code Generation** (three-address code),
-- **Target Code Generation** (assembly),
-- **Assembly & Linking** (NASM and ld),
-- and finally, **Execution**.
+### 1️⃣ Clone the Repository
 
-By running `python3 main.py COMPUTE_Z 2 3`, you see how the equation `z = a*a + b*b - 2*a*b` is computed step by step, and you gain insight into how compilers process arithmetic expressions at a low level.
+```bash
+git clone https://github.com/Piyush-Lokhande07/CustomInstruction.git
+cd mini_compiler
+```
+
+### 2️⃣ Assemble the Code
+
+```bash
+nasm -f elf64 compute_z.asm -o compute_z.o
+```
+
+### 3️⃣ Link the Object File
+
+```bash
+ld -o compute_z compute_z.o
+```
+
+### 4️⃣ Run the Python Script
+
+```bash
+python3 main.py COMPUTE_Z 2 3
+```
+
+🖥️ Output:
+- Computed result of `z`
+- Tokens
+- Symbol Table
+- Three-Address Code
+
+### 5️⃣ View the Assembly Code (Optional)
+
+```bash
+objdump -d compute_z
+```
+
+---
+
+## 🗂️ File Structure
+
+```bash
+mini_compiler/
+├── compute_z.asm         # Custom assembly logic
+├── compute_z.o           # Object file (generated)
+├── compute_z             # Executable (linked)
+├── main.py               # Main Python controller
+└── compiler/
+    ├── input_writer.py   # Writes a, b into the ASM file
+    └── compiler_utils.py # Generates tokens, symbol table, TAC
+```
+
+---
+
+## ✅ Conclusion
+
+This project simulates how a real compiler works under the hood:
+
+🔹 **Lexical Analysis** → Tokens  
+🔹 **Syntax & Semantic Analysis** → Symbol Table  
+🔹 **Intermediate Code** → Three-Address Code  
+🔹 **Target Code Generation** → Custom Assembly  
+🔹 **Assembler & Linker** → Machine Code & Executable  
+🔹 **Execution** → Result printed in terminal  
+
+⚙️ The result of `z = a*a + b*b - 2*a*b` is calculated using hand-written assembly, with compiler-style analysis and automation.
 
 ---
