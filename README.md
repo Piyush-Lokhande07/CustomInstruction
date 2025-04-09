@@ -262,3 +262,10 @@ You've successfully built a **mini compiler** that:
 - Offers full visibility via `objdump` 🔍
 
 This project gives hands-on understanding of **compiler construction**, **register-level computation**, and **low-level architecture**. 🧠
+
+<h1 align="center" style="font-size: 3em;">🚀 Project by</h1>
+<h1 align="center" style="font-size: 3.5em; color: #4CAF50;">👤 <b>Piyush Lokhande</b></h1>
+<h2 align="center" style="font-size: 2.5em; color: #2196F3;">🎓 <b>Roll No:</b> 23115071</h2>
+
+
+
